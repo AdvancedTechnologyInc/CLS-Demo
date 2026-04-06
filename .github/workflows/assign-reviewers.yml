@@ -1,0 +1,36 @@
+name: "Assign Reviewers"
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  assign-reviewers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Assign reviewers from team"
+        uses: dc-ag/auto-assign-reviewers-from-team@v1.2.2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          admin-repo-token: ${{ secrets.TOKEN }} # 레포 권한 있는 개인토큰 사용
+          team: "Review-GroupW-B" # 팀이름 
+          amount: 0 # amount 0이면 팀 모든 멤버가 리뷰어로 할당, 특정인원만 배정하고 싶으면 값조정
+          use-team-reviewer-settings: false # True로 설정하면 팀 설정에서 자동 리뷰어 배정을 따름/false면 직접 설정한 amount 반영
+          ignore-branches-regex: "" # 특정브랜치 제외 원한다면, 예시 -> "^main$|^release/.*"
+
+      - name: "Assign reviewers from team 2nd"
+        uses: dc-ag/auto-assign-reviewers-from-team@v1.2.2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          admin-repo-token: ${{ secrets.TOKEN }} # 레포 권한 있는 개인토큰 사용
+          team: "Review-GroupW-A" # 팀이름 
+          amount: 0 # amount 0이면 팀 모든 멤버가 리뷰어로 할당, 특정인원만 배정하고 싶으면 값조정
+          use-team-reviewer-settings: false # True로 설정하면 팀 설정에서 자동 리뷰어 배정을 따름/false면 직접 설정한 amount 반영
+          ignore-branches-regex: "" # 특정브랜치 제외 원한다면, 예시 -> "^main$|^release/.*"
+
+  assign-assignees:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign Pull Request Author and Reviewers
+        uses: hkusu/review-assign-action@v1
+        with:
+          assignees: ${{ github.actor }} # assign pull request author

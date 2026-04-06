@@ -1,0 +1,31 @@
+name-template: '$RESOLVED_VERSION' #label 지정해서 version 올릴 수 있음
+tag-template: '$RESOLVED_VERSION'
+categories: # PR을 열 때 labels를 어떤 것으로 설정하냐에 따라 각 label에 맞는 title로 PR 분류
+  - title: '🔥 Critical'
+    labels:
+     - 'Type:Hotfix'
+  - title: '🚀 Feature'
+    labels:
+     - 'Type:Feature'
+  - title: '🧱 Enhancement'
+    labels:
+     - 'Type:Enhancement'
+     - 'Type:Design'
+  - title: '🐛 Bug'
+    labels:
+     - 'Type:Bug'
+  - title: '🧰 Maintenance'
+    labels:
+     - 'Type:Maint'
+  - title: '⚙ Configuration'
+    labels:
+     - 'Type:Config'
+  - title: '🌐 QA'
+    labels:
+     - 'Type:Branching'
+     - 'Type:CI/CD'
+change-template: '- $TITLE (#$NUMBER) @$AUTHOR'  # PR의 내용이 release note에 적힐 때 어떤 format으로 적힐지 정하기
+change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
+template: | # Release note의 전체적인 format 정의
+  ## Uncategorized
+  $CHANGES

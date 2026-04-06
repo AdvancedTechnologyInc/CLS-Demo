@@ -1,0 +1,61 @@
+name: Sync PR Title with Issue
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: read
+
+jobs:
+  sync-title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync PR title from referenced issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.setFailed('No pull request found.');
+              return;
+            }
+
+            // PR body에서 #123 형태 찾기 (예: "Fixes #123", "Related to #123" 등)
+            const m = (pr.body || '').match(/(?:^|\s)#(\d+)\b/);
+            if (!m) {
+              core.notice('No issue number found in PR body. Skipping.');
+              return;
+            }
+
+            const issue_number = Number(m[1]);
+
+            const { owner, repo } = context.repo;
+
+            const { data: issue } = await github.rest.issues.get({
+              owner, repo, issue_number
+            });
+
+            const newTitle = issue.title?.trim();
+            const currentTitle = (pr.title || '').trim();
+
+            if (!newTitle) {
+              core.notice('Issue title is empty. Skipping.');
+              return;
+            }
+
+            if (newTitle === currentTitle) {
+              core.notice('PR title already matches issue title. Skipping.');
+              return;
+            }
+
+            await github.rest.pulls.update({
+              owner, repo,
+              pull_number: pr.number,
+              title: newTitle
+            });
+
+            core.notice(`PR title updated: "${currentTitle}" -> "${newTitle}"`);
